@@ -1,0 +1,21 @@
+package monarch;
+
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.testng.annotations.BeforeTest;
+
+public class Web {
+WebDriver driver;
+@BeforeTest
+public void openBrowser() {
+	System.setProperty("webdriver.chrome.driver", "chromedriver.gz");
+	driver= new ChromeDriver();
+	driver.manage().window().maximize();
+	driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+	driver.get("http://pjm.com");
+	driver.quit();
+}
+}
