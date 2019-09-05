@@ -1,0 +1,128 @@
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import java.lang.System;
+import java.lang.Class;
+import javax.swing.text.DateFormatter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
+
+public class Main {
+    public static void main(String[] args) throws IOException, ParseException, SQLException, ClassNotFoundException {
+        FileInputStream file = new FileInputStream(new File("C:\\Users\\Reporting\\td.xlsx"));
+        XSSFWorkbook workbook = new XSSFWorkbook(file);
+        XSSFSheet sheet = workbook.getSheetAt(0);
+        
+//Connect to DB
+        String dbURL = "jdbc:oracle:thin:@edwhtst.kmhp.com:1521:podwh1ts";
+        String user = "mk[GLOBL]";
+        String password = "dajim2026";
+        Class.forName("oracle.jdbc.driver.OracleDriver");
+        Connection conn = DriverManager.getConnection(dbURL, user, password);
+        Statement st = conn.createStatement();
+
+//kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+        //To Run SQL from Excell
+        FileInputStream file0 = new FileInputStream(new File("C:\\Users\\mk28393\\Desktop\\Working\\Reporting\\SQLQuery.xlsx"));
+        XSSFWorkbook workbook0 = new XSSFWorkbook(file0);
+        XSSFSheet sheet0 = workbook0.getSheetAt(0);
+        for (int j = 1; j <= sheet0.getLastRowNum(); j++) {
+            Row row0 = sheet0.getRow(j);
+            if (row0.getCell(0).getCellType() == CellType.STRING)
+              //  st.executeQuery((((XSSFRow) row0).getCell(0).getStringCellValue()));
+            System.out.println(st.executeQuery((((XSSFRow) row0).getCell(0).getStringCellValue())));
+
+            System.out.println("0:- query ran successfully" + j);
+            if (row0.getCell(0).getCellType() == CellType.NUMERIC) {
+                Double value0 = row0.getCell(0).getNumericCellValue();
+                Long lv0 = value0.longValue();
+                //   String q2= lv.toString();
+                //System.out.println(lv0.toString());
+                st.executeQuery(lv0.toString());
+                System.out.println("1:- query ran successfully" + j);
+            }
+        }
+        //kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+
+//==========================================================================================
+//To INSERT data into DB table
+
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+            Row row = sheet.getRow(i);
+            if (row.getCell(0).getCellType() == CellType.STRING)
+                //     System.out.println(((XSSFRow) row).getCell(0).getStringCellValue());
+                st.executeQuery("INSERT INTO MedEcon_TA_B (MEMBER_ID) VALUES (" + (((XSSFRow) row).getCell(0).getStringCellValue()) + ")");
+            if (row.getCell(0).getCellType() == CellType.NUMERIC) {
+                Double value = row.getCell(0).getNumericCellValue();
+                Long lv = value.longValue();
+                System.out.println(lv.toString());
+                //   String q2= lv.toString();
+                st.executeQuery("INSERT INTO MedEcon_TA_B (MEMBER_ID) VALUES (" + lv.toString() + ")");
+            }
+        }
+        //kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+//To Drop All created tables from DB
+
+        for (int k = 1; k <= sheet0.getLastRowNum(); k++) {
+            Row row0 = sheet0.getRow(k);
+            if (row0.getCell(1).getCellType() == CellType.STRING)
+                //System.out.println(((XSSFRow) row0).getCell(0).getStringCellValue());
+
+                st.executeQuery("DROP TABLE " + (((XSSFRow) row0).getCell(1).getStringCellValue()));
+            st.setQueryTimeout(100);
+            System.out.println("0:- Droped Table successfully" + k);
+            if (row0.getCell(1).getCellType() == CellType.NUMERIC) {
+                Double value0 = row0.getCell(1).getNumericCellValue();
+                Long lv0 = value0.longValue();
+                //   String q2= lv.toString();
+                //System.out.println(lv0.toString());
+
+                st.executeQuery("DROP TABLE " + lv0.toString());
+                st.setQueryTimeout(100);
+                System.out.println("1:- Droped Table successfully" + k);
+
+            }
+        }
+        //kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+        conn.close();
+    }
+}
+
+//        Calendar cal = Calendar.getInstance();
+//        cal.add(Calendar.DATE, -30);
+//
+//
+//    //===========Gradle Dependencies ==============
+//    // https://mvnrepository.com/artifact/org.apache.poi/poi
+//    compile group: 'org.apache.poi', name: 'poi', version: '4.0.1'
+//        testCompile group: 'org.apache.poi', name: 'poi', version: '4.0.1'
+//        // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+//        compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.0'
+//        testCompile group:'org.apache.poi', name: 'poi-ooxml', version: '4.1.0'
+//        // https://mvnrepository.com/artifact/org.apache.xmlbeans/xmlbeans
+//        compile group: 'org.apache.xmlbeans', name: 'xmlbeans', version: '3.1.0'
+//        testCompile group:'org.apache.xmlbeans', name: 'xmlbeans', version: '3.1.0'
+//// https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
+//        compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
+//        testCompile group:'org.apache.commons', name: 'commons-collections4', version: '4.4'
+//// https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
+//        compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+//        testCompile group:'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+//// https://mvnrepository.com/artifact/org.apache.commons/commons-compress
+//        compile group: 'org.apache.commons', name: 'commons-compress', version: '1.18'
+//        testCompile group:'org.apache.commons', name: 'commons-compress', version: '1.18'
+//// https://mvnrepository.com/artifact/dom4j/dom4j
+//        compile group: 'dom4j', name: 'dom4j', version: '1.6.1'
+//        testCompile group: 'dom4j', name: 'dom4j', version: '1.6.1'
+//// https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+//        compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.0'
+//        testCompile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.0'
