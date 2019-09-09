@@ -1,0 +1,160 @@
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.*;
+import java.sql.*;
+
+public class DWHTesting {
+    private FileInputStream file;
+    private XSSFWorkbook workbook;
+    private XSSFSheet sheet;
+    private Connection conn;
+    private Statement st;
+
+    public void createTableInDB(String excelPath, int sheetNumber) throws IOException, ClassNotFoundException, SQLException {
+        file = new FileInputStream(new File(excelPath));
+        workbook = new XSSFWorkbook(file);
+        sheet = workbook.getSheetAt(sheetNumber);
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {//Read column number 1; index start from 0;
+            Row row = sheet.getRow(i);
+            if (row.getCell(0).getCellType() == CellType.STRING)
+                // System.out.println(((XSSFRow) row).getCell(0).getStringCellValue());
+                st.executeQuery(((XSSFRow) row).getCell(0).getStringCellValue());
+            System.out.println("Table: " + i + "- Created(0)");
+            if (row.getCell(0).getCellType() == CellType.NUMERIC) {
+                Double value = row.getCell(0).getNumericCellValue();
+                Long lv = value.longValue();
+                String data2 = lv.toString();
+                st.executeQuery(data2);
+                System.out.println("Table: " + i + "- Created(1)");
+            }
+        }
+        file.close();
+    }
+
+    public void inserDataFromExcel(String excelPath, int sheetNumber, int columIndex) throws IOException, ClassNotFoundException, SQLException {
+        file = new FileInputStream(new File(excelPath));
+        workbook = new XSSFWorkbook(file);
+        sheet = workbook.getSheetAt(sheetNumber);
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {//Read column number 1; index start from 0;
+            Row row = sheet.getRow(i);
+            if (row.getCell(columIndex).getCellType() == CellType.STRING)
+                // System.out.println(((XSSFRow) row).getCell(0).getStringCellValue());
+                //  st.executeQuery("INSERT INTO "+ tableName+" ("+columnName+") Values ("+((XSSFRow) row).getCell(0).getStringCellValue()+")");
+                st.executeQuery("INSERT INTO MedEcon_TA_a (MEMBER_ID) VALUES (" + (((XSSFRow) row).getCell(columIndex).getStringCellValue()) + ")");
+//            System.out.println("0.Data Inserted"+i);
+            if (row.getCell(columIndex).getCellType() == CellType.NUMERIC) {
+                Double value = row.getCell(columIndex).getNumericCellValue();
+                Long lv = value.longValue();
+                String data2 = lv.toString();
+                //  st.executeQuery("INSERT INTO "+tableName+" ("+") Values ("+data2+")");
+                st.executeQuery("INSERT INTO MedEcon_TA_a (MEMBER_ID) VALUES (" + lv.toString() + ")");
+//                System.out.println("1.Data Inserted"+i);
+            }
+        }
+        file.close();
+    }
+
+    public void dropDBTable(String excelPath, int sheetNumber) throws IOException, ClassNotFoundException, SQLException {
+        file = new FileInputStream(new File(excelPath));
+        workbook = new XSSFWorkbook(file);
+        sheet = workbook.getSheetAt(sheetNumber);
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {//Read column number 1; index start from 0;
+            Row row = sheet.getRow(i);
+            if (row.getCell(1).getCellType() == CellType.STRING)
+                // System.out.println(((XSSFRow) row).getCell(0).getStringCellValue());
+                st.executeQuery("DROP TABLE " + ((XSSFRow) row).getCell(1).getStringCellValue());
+            System.out.println("Table: " + i + "Dropped(0)");
+            if (row.getCell(1).getCellType() == CellType.NUMERIC) {
+                Double value = row.getCell(1).getNumericCellValue();
+                Long lv = value.longValue();
+                String data2 = lv.toString();
+                st.executeQuery("DROP TABLE " + data2);
+                System.out.println("Table: " + i + "Droped");
+            }
+        }
+        file.close();
+    }
+
+    public void connectDB(String driver, String dbURL, String user, String password) throws ClassNotFoundException, SQLException {
+        conn = DriverManager.getConnection(dbURL, user, password);
+        st = conn.createStatement();
+    }
+
+    public void displayDataOption2(int dbColumnIndex, String resultTextFile, String excelPath, int sheetNumber) throws SQLException, IOException {
+        file = new FileInputStream(new File(excelPath));
+        workbook = new XSSFWorkbook(file);
+        sheet = workbook.getSheetAt(sheetNumber);
+        FileWriter file = new FileWriter(resultTextFile);
+        PrintWriter pw = new PrintWriter(file);
+        // ResultSet rs = st.executeQuery("Select * from medecon_ta_b");
+        pw.println("Below are the Final Returns for your given SQL statements");
+        pw.println("=========================================================");
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {//Read from row number 1; index start from 0;
+            Row row = sheet.getRow(i);
+            if (row.getCell(2).getCellType() == CellType.STRING)//Read from Column number 2;
+                System.out.println(((XSSFRow) row).getCell(2).getStringCellValue());
+         ResultSet   rs= st.executeQuery(((XSSFRow) row).getCell(2).getStringCellValue());
+            while (rs.next()) {
+                pw.println(rs.getString(dbColumnIndex));
+            }
+            if (row.getCell(2).getCellType() == CellType.NUMERIC) {
+                Double value = row.getCell(2).getNumericCellValue();
+                Long lv = value.longValue();
+                String data2 = lv.toString();
+                System.out.println(data2);
+               rs= st.executeQuery(data2);
+                while (rs.next()) {
+                    pw.println(rs.getString(dbColumnIndex));
+                }
+            }
+            rs.close();
+        }
+        file.close();
+        pw.close();
+    }
+    public void displayDataOption0(int dbColumnIndex, String resultTextFile, String sQuery) throws SQLException, IOException {
+        FileWriter file = new FileWriter(resultTextFile);
+        PrintWriter pw = new PrintWriter(file);
+        ResultSet rs = st.executeQuery(sQuery);
+        pw.println("Below are the Final Returns for your given SQL statements");
+        pw.println("=========================================================");
+        while (rs.next()) {
+            pw.println(rs.getString(dbColumnIndex));
+        }
+        pw.close();
+    }
+
+    public void last(String excelPath, int sheetNumber) throws IOException, ClassNotFoundException, SQLException {
+        file = new FileInputStream(new File(excelPath));
+        workbook = new XSSFWorkbook(file);
+        sheet = workbook.getSheetAt(sheetNumber);
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {//Read column number 1; index start from 0;
+            Row row = sheet.getRow(i);
+            if (row.getCell(2).getCellType() == CellType.STRING)
+                // System.out.println(((XSSFRow) row).getCell(0).getStringCellValue());
+                st.executeQuery(((XSSFRow) row).getCell(2).getStringCellValue());
+            System.out.println(((XSSFRow) row).getCell(2).getStringCellValue());
+            if (row.getCell(2).getCellType() == CellType.NUMERIC) {
+                Double value = row.getCell(2).getNumericCellValue();
+                Long lv = value.longValue();
+                String data2 = lv.toString();
+                st.executeQuery(data2);
+                System.out.println(data2);
+            }
+        }
+        file.close();
+    }
+    public void clsoeDBConnection() throws SQLException {
+        if (st != null) {
+            st.close();
+        }
+        if (conn != null) {
+            conn.close();
+        }
+        System.out.println("Execution has been COMPLETED..!");
+    }
+}

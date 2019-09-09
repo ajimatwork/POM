@@ -1,0 +1,24 @@
+import java.io.IOException;
+import java.sql.SQLException;
+public class Main {
+    public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException {
+// Link DWHTesting with this Main Class;
+        DWHTesting dwht = new DWHTesting();
+        System.out.println("Execution has STARTED..!");
+
+        dwht.connectDB("jdbc:oracle.driver.OracleDriver",
+                "jdbc:oracle:thin:@edwhtst.kmhp.com:1521:podwh1ts",
+                "userName",
+                "Password");
+        dwht.createTableInDB("C:\\Users\\mk28393\\Desktop\\Working\\Reporting\\SQLQuery.xlsx",
+                0);
+        dwht.inserDataFromExcel("C:\\Users\\mk28393\\Desktop\\Working\\Reporting\\td.xlsx",
+                0,0);//insert data from first excel coulmn;
+        dwht.displayDataOption0(1,
+                "C:\\Users\\mk28393\\Desktop\\Working\\Reporting\\Result.txt",
+                "select * from medecon_ta_a");
+        dwht.dropDBTable("C:\\Users\\mk28393\\Desktop\\Working\\Reporting\\SQLQuery.xlsx",
+                0);
+        dwht.clsoeDBConnection();
+    }
+}
