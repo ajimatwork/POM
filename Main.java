@@ -4,16 +4,16 @@ import java.sql.SQLException;
 public class Main {
     public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException {
 // Link DWHTesting with this Main Class;
-        String enterReportPath = "C:\\Users\\mk28393\\Desktop\\Working\\New folder\\La Red_HEDIS_May 2019_remove LTSS_V2_DOB.xlsx";
+        String enterReportPath = "C:\\Users\\mk28393\\Desktop\\Working\\New folder\\DOB.xlsx";
         int enterIndexOfSheet = 6;
         int enterColumnIndexOfSheet = 0;
 //=================================No Change Required Below this Point==================================================
         DWHTesting dwht = new DWHTesting();
         System.out.println("Execution has STARTED.....");
         dwht.connectDB("jdbc:oracle.driver.OracleDriver",
-                "jdbc:oracle:thin:@edwhtst.kmhp.com:1521:podwh1ts",
-                "mk28393[GLOBL]",
-                "Mdajim2026");
+                "jdbc:oracle:thin:@facebook.khpp.com:1521:sqadwh1ts",
+                "ajim",
+                "4333ajim");
         dwht.createTableInDB("C:\\Users\\mk28393\\Desktop\\Working\\Reporting\\SQLQuery.xlsx",
                 1, 0);
 //        dwht.inserDataFromExcel("C:\\Users\\mk28393\\Desktop\\Working\\New folder\\La Red_HEDIS_May 2019_remove LTSS_V2_DOB.xlsx",
