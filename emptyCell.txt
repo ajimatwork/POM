@@ -1,0 +1,22 @@
+public void drop(String excelPath, int sheetNumber, int columnIndex) throws IOException, ClassNotFoundException, SQLException {
+    file = new FileInputStream(new File(excelPath));
+    workbook = new XSSFWorkbook(file);
+    sheet = workbook.getSheetAt(sheetNumber);
+    for (int i = 1; i <= sheet.getLastRowNum(); i++) {//Read column number 1; index start from 0;
+        XSSFRow row = sheet.getRow(i);
+        if (row.getCell(columnIndex).getRawValue().equals(true)){
+            if (row.getCell(columnIndex).getCellType() == CellType.STRING)
+                // System.out.println(((XSSFRow) row).getCell(0).getStringCellValue());
+                st.executeQuery("DROP TABLE " + ((XSSFRow) row).getCell(columnIndex).getStringCellValue());
+            System.out.println("Table: " + i + "- Dropped(0)");
+            if (row.getCell(columnIndex).getCellType() == CellType.NUMERIC) {
+                Double value = row.getCell(columnIndex).getNumericCellValue();
+                Long lv = value.longValue();
+                String data2 = lv.toString();
+                st.executeQuery("DROP TABLE " + data2);
+                System.out.println("Table: " + i + "- Dropped(1)");
+            }
+        }
+    }
+    file.close();
+}
